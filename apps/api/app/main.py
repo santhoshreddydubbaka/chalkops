@@ -8,6 +8,7 @@ from app.api.routes.services.routes import router as services_router
 from app.api.routes.environments.routes import router as env_router
 from app.api.routes.deployments.routes import router as deployments_router
 from app.api.routes.runbooks.routes import router as runbooks_router
+from app.api.routes.incidents.routes import router as incidents_router
 
 app = FastAPI(title="ChalkOps API", version="0.1.0")
 
@@ -29,3 +30,4 @@ app.include_router(services_router)
 app.include_router(env_router)
 app.include_router(deployments_router)
 app.include_router(runbooks_router)
+app.include_router(incidents_router)
