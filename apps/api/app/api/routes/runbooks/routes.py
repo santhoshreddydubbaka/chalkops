@@ -1,12 +1,19 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+import psycopg
+
+from app.config import settings
 
 router = APIRouter(prefix="/runbooks", tags=["runbooks"])
 
-_RUNBOOKS = [
-    {"id": "rb1", "title": "API down (local)", "steps": ["Check /health", "Check logs", "Restart uvicorn"]},
-    {"id": "rb2", "title": "Frontend not loading (local)", "steps": ["Check vite terminal", "Restart npm run dev"]},
-]
-
 @router.get("")
 def list_runbooks():
-    return _RUNBOOKS
+    url = settings.database_url
+    if not url:
+        raise HTTPException(status_code=500, detail="DATABASE_URL missing. Set it in apps/api/.env")
+
+    with psycopg.connect(url) as conn:
+        with conn.cursor() as cur:
+            cur.execute("select id, title, steps from runbooks order by id;")
+            rows = cur.fetchall()
+
+    return [{"id": r[0], "title": r[1], "steps": r[2]} for r in rows]
